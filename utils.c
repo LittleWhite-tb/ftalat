@@ -41,6 +41,23 @@ FILE* openCPUFreqFile(unsigned int coreID, const char* fileName, const char* mod
    return pFile;
 }
 
+int openCPUMSR(unsigned int coreID)
+{
+   char msrPathBuffer[BUFFER_PATH_SIZE]= {'\0'};
+   snprintf(msrPathBuffer,BUFFER_PATH_SIZE,MSR_PATH_FORMAT,coreID);
+ 
+
+   int pMSR = open(msrPathBuffer, O_RDWR);
+   if ( pMSR < 0)
+   {
+      fprintf(stderr,"Fail to open %s\n",msrPathBuffer);
+   }
+   
+   return pMSR;
+}
+
+
+
 void pinCPU(int cpu)
 {
    cpu_set_t cpuset;

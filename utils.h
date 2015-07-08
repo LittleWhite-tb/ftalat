@@ -24,6 +24,7 @@
 #define BUFFER_PATH_SIZE 100
 
 #define CPU_PATH_FORMAT "/sys/devices/system/cpu/cpu%d/cpufreq/%s"
+#define MSR_PATH_FORMAT "/dev/cpu/cpu%d/msr"
 
 /**
  * Easy to use function to open any file related to a CPU core
@@ -35,6 +36,16 @@
  * \warning don't forget to close the pointeur returned with fclose
  */
 FILE* openCPUFreqFile(unsigned int coreID, const char* fileName, const char* mode);
+
+/**
+ * Easy to use function to open any MSR file related to a CPU core
+ * (files are located in /dev/cpu/cpu[coreID]/msr)
+ * \param coreID the id of the core to look at
+ * \return the file descriptor
+ * \warning don't forget to close the descriptor returned with close
+ */
+int openCPUMSR(unsigned int coreID, int mode);
+
 
 /**
  * Pin the current program to a specific core using CPU_SET and

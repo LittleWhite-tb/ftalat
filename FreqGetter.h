@@ -41,6 +41,8 @@ void freeFreqInfo();
  */
 unsigned int getCurFreq(unsigned int coreID);
 
+unsigned int getCurDCM(unsigned int coreID);
+
 /**
  * Wait the core identified by \a coreID to be at \a targetFreq frequency
  * \param coreID core identifier 
@@ -48,12 +50,22 @@ unsigned int getCurFreq(unsigned int coreID);
  */
 inline void waitCurFreq(unsigned int coreID, unsigned int targetFreq);
 
+inline void waitCurDCM(unsigned int coreID, unsigned int targetFreq);
+
 /**
  * Get the minimum frequency available for the core identified by \a coreID
  * \param coreID core identifier
  * \return
  */
 unsigned int getMinAvailableFreq(unsigned int coreID);
+
+/**
+ * Get the minimum frequency available for the core identified by \a coreID
+ * \param coreID core identifier 
+ * \return Depends on whether CPU Clock Modulation Extended or not 
+ *
+ */
+unsigned int getMinAvailableDCM(unsigned int coreID);
 
 /**
  * Get the maximum frequency available for the core identified by \a coreID

@@ -31,6 +31,7 @@
 #include "utils.h"
 
 FILE** pSetFiles = NULL;
+unsigned int* pSetMSRs = -1;
 
 char openFreqSetterFiles()
 {
@@ -57,12 +58,47 @@ char openFreqSetterFiles()
    return 0;
 }
 
+char openDCMSetterMSRs()
+{
+   unsigned int nbCore = getCoreNumber();
+
+   pSetMSRs = malloc (sizeof(unsigned int) * nbCore);
+   
+   if (pSetMSRs == NULL)
+   {
+      fprintf(stdout,"Fail to allocate memory for file descriptors\n");
+      return -1;
+   }
+     
+   unsigned int i = 0;
+   for ( i = 0 ; i < nbCore ; i++ )
+   {
+      pSetMSRs[i] = openCPUMSR(i);
+      if ( pSetMSRs[i] < 0 )
+      {
+         return -1;
+      }
+   }
+   
+   return 0;
+
+}
+
 inline void setFreq(unsigned int coreID, unsigned int targetFreq)
 {
    assert(coreID < getCoreNumber());
    
    fprintf(pSetFiles[coreID],"%d",targetFreq);
    fflush(pSetFiles[coreID]);
+}
+
+
+inline void setDCM(unsigned int coreID, unsigned int targetDCM)
+{
+   assert(coreID < getCoreNumber());
+   
+   pwrite(pSetMSRs[coreID], &targetDCM, sizeof targetDCM, 0x19a);
+      
 }
 
 inline void setAllFreq(unsigned int targetFreq)
@@ -74,6 +110,17 @@ inline void setAllFreq(unsigned int targetFreq)
    {
       fprintf(pSetFiles[i],"%d",targetFreq);
       fflush(pSetFiles[i]);
+   }
+}
+
+inline void setAllDCM(unsigned int targetDCM)
+{
+   int nbCore = getCoreNumber();
+   int i;
+   
+   for (i = 0; i < nbCore ; i++ )
+   {
+      pwrite(pSetMSRs[i], &targetDCM, sizeof targetDCM, 0x19a);
    }
 }
 
@@ -100,6 +147,25 @@ void closeFreqSetterFiles(void)
       }
       
       free(pSetFiles);
+   }
+}
+
+void closeDCMSetterMSRs(void) 
+{
+   int nbCore = getCoreNumber();
+   int i = 0;
+   
+   if ( pSetMSRs )
+   {
+      for ( i = 0 ; i < nbCore ; i++ )
+      {
+         if ( pSetMSRs[i] >= 0 )
+         {
+            close(pSetMSRs[i]);
+         }
+      }
+      
+      free(pSetMSRs);
    }
 }
 

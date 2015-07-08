@@ -24,11 +24,20 @@
  * \return 0 is everything gone fine
  */
 char openFreqSetterFiles();
+/**
+ * Open and prepare DCM operation
+ * \return 0 is everything gone fine
+ */
+char openDCMSetterMSRs();
 
 /**
  * Close the opened file to change frequencies
  */
 void closeFreqSetterFiles(void);
+/**
+ * Close the opened MSR to change DCM 
+ */
+void closeDCMSetterMSRs(void);
 
 /**
  * Set a new frequency for a specific core determined by \a coreID
@@ -36,17 +45,33 @@ void closeFreqSetterFiles(void);
  * \param targetFreq the new freq
  */
 inline void setFreq(unsigned int coreID, unsigned int targetFreq);
+/**
+ * Set a new DCM frequency for a specific core determined by \a coreID
+ * \param coreID the id of the core to set
+ * \param targetDCM the new DCM 
+ */
+inline void setDCM(unsigned int coreID, unsigned int targetDCM);
 
 /**
  * Set a new frequency for all cores
  * \param targetFreq the new freq
  */
 inline void setAllFreq(unsigned int targetFreq);
+/**
+ * Set a new DCM frequency for all cores
+ * \param targetDCM the new DCM
+ */
+inline void setAllDCM(unsigned int targetDCM);
+
 
 /**
  * Set the minimal available frequency for all cores
  */
 inline void setMinFreqForAll();
+/**
+ * Set the minimal available DCM for all cores (actually 1)
+ */
+inline void setMinDCMForAll();
 
 
 /**
@@ -56,4 +81,7 @@ inline void setMinFreqForAll();
  */
 char setCPUGovernor(const char* newPolicy);
 
+/**
+ * No DCM counter-part
+ */
 #endif
