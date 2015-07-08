@@ -50,6 +50,10 @@ const float DIFF_OFFSET_PERCENTAGE = 25.0f;
 
 unsigned long times[NB_BENCH_META_REPET] ;
 
+/* easier impelemntation */
+int msrValues[]=
+{0, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 0};
+
 void usage()
 {
    fprintf(stdout,"./ftalat [-c coreID] startFreq targetFreq\n");
@@ -99,8 +103,13 @@ void runTest(unsigned int startFreq, unsigned int targetFreq, unsigned int coreI
    unsigned long targetQ1=0;
    unsigned long targetQ3=0;
 
+#ifdef DVFS
    setFreq(coreID,targetFreq);
    waitCurFreq(coreID,targetFreq);
+#else
+   setDCM(coreID, targetFreq);
+   /* do I need to waitCurDCM? */ 
+#endif
    targetBenchTime = measureLoop(NB_BENCH_META_REPET);
    fprintf(stdout,"Bench %d %.2f\n",targetFreq, targetBenchTime); 
    targetBenchSD = sd(NB_BENCH_META_REPET, targetBenchTime, times);
@@ -108,9 +117,12 @@ void runTest(unsigned int startFreq, unsigned int targetFreq, unsigned int coreI
    // Build the inter-quartile range for the target frequency
    interQuartileRange(NB_BENCH_META_REPET, times, 
 		&targetQ1, &targetQ3);
-   
+#ifdef DVFS   
    setFreq(coreID,startFreq);
    waitCurFreq(coreID,startFreq);
+#else
+   setDCM(coreID, startFreq);
+#endif
    startBenchTime = measureLoop(NB_BENCH_META_REPET);  
    fprintf(stdout,"Bench %d %.2f\n",startFreq, startBenchTime);
    startBenchSD = sd(NB_BENCH_META_REPET, startBenchTime, times);
@@ -183,7 +195,11 @@ void runTest(unsigned int startFreq, unsigned int targetFreq, unsigned int coreI
 #endif
 
          sync_rdtsc1(startLoopTime);
+#ifdef DVFS
          setFreq(coreID,targetFreq);
+#else 
+         setDCM(coreID, targetFreq);
+#endif
          sync_rdtsc1(lateStartLoopTime);
          do
          {
@@ -215,8 +231,12 @@ void runTest(unsigned int startFreq, unsigned int targetFreq, unsigned int coreI
          if ( validateHighBoundTime < targetLowBoundTime  || validateLowBoundTime > targetHighBoundTime )
          {
             validated = 0;
+#ifdef DVFS
             setFreq(coreID,startFreq);
             waitCurFreq(coreID,startFreq);
+#else
+            setDCM(coreID, startFreq);
+#endif
          }
       }while(!validated && ++j < NB_TRY_REPET);
 
@@ -326,9 +346,10 @@ int main(int argc, char** argv)
       fprintf(stdout,"Core ID is set to 0\n");
       coreID = 0;
    }
-   
+#ifdef DVFS   
    initFreqInfo();
-   
+#endif
+#ifdef DVFS   
    if ( isFreqAvailable(coreID,startFreq) == 0 )
    {
       fprintf(stdout,"The starting frequency that you have entered (%d) is not available for the core %d\n",startFreq,coreID);
@@ -346,7 +367,7 @@ int main(int argc, char** argv)
    }
    
    initCoreRelations();
-   
+#endif 
    
 #ifdef _DUMP
    openDump("./results.dump",NB_TRY_REPET_LOOP*NB_VALIDATION_REPET);
@@ -365,27 +386,40 @@ int main(int argc, char** argv)
    {
       perror("setscheduler background");
    }
-
+#ifdef DVFS
    if ( setCPUGovernor("userspace") != 0 )
    {
       fprintf(stderr,"We are unable to set \"userspace\" governor. Do you have cpufreq and permissions ?\n");
       cleanup();
       return -5;
    }
-
+#endif
+#ifdef DVFS
    // Set the minimal frequency
    if ( openFreqSetterFiles() != 0 )
    {
       cleanup();
       return -3;
    }
+#else
+   if ( openDCMSetterMSRs() != 0) {
+      /* cleanup(); ? */
+      return -3;
+   }
+#endif
 
+#ifdef DVFS
    setFreqForAllRelatedCore(coreID,getMinAvailableFreq(coreID));
    runTest(startFreq, targetFreq, coreID);
+#else
+   setDCM(coreID, msrValues[1]);
+   runTest(msrValues[startFreq], msrValues[targetFreq], coreID);
+#endif
 
    // kill bg thread
    pthread_cancel(bgth);
-
+#ifdef DVFS
    cleanup();
+#endif
    return 0;
 }

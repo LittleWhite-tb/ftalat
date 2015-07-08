@@ -24,7 +24,7 @@
 #define BUFFER_PATH_SIZE 100
 
 #define CPU_PATH_FORMAT "/sys/devices/system/cpu/cpu%d/cpufreq/%s"
-#define MSR_PATH_FORMAT "/dev/cpu/cpu%d/msr"
+#define MSR_PATH_FORMAT "/dev/cpu/%d/msr"
 
 /**
  * Easy to use function to open any file related to a CPU core
@@ -44,7 +44,7 @@ FILE* openCPUFreqFile(unsigned int coreID, const char* fileName, const char* mod
  * \return the file descriptor
  * \warning don't forget to close the descriptor returned with close
  */
-int openCPUMSR(unsigned int coreID, int mode);
+int openCPUMSR(unsigned int coreID);
 
 
 /**

@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <sched.h>
 
+#include <fcntl.h>
+
 FILE* openCPUFreqFile(unsigned int coreID, const char* fileName, const char* mode)
 {
    char filePathBuffer[BUFFER_PATH_SIZE]= {'\0'};

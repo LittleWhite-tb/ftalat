@@ -161,7 +161,7 @@ unsigned int getCurDCM(unsigned int coreID)
       /* IA32_CLOCK_MODULATION = 0x19a */
       pread(pMSRFile, &dcm, sizeof dcm, 0x19a);
       
-      pclose(pFreqFile);
+      close(pMSRFile);
    }
    
    return dcm;

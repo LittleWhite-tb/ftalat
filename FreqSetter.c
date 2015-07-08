@@ -31,7 +31,7 @@
 #include "utils.h"
 
 FILE** pSetFiles = NULL;
-unsigned int* pSetMSRs = -1;
+int* pSetMSRs = NULL;
 
 char openFreqSetterFiles()
 {
@@ -62,7 +62,7 @@ char openDCMSetterMSRs()
 {
    unsigned int nbCore = getCoreNumber();
 
-   pSetMSRs = malloc (sizeof(unsigned int) * nbCore);
+   pSetMSRs = malloc (sizeof(int) * nbCore);
    
    if (pSetMSRs == NULL)
    {
@@ -74,6 +74,7 @@ char openDCMSetterMSRs()
    for ( i = 0 ; i < nbCore ; i++ )
    {
       pSetMSRs[i] = openCPUMSR(i);
+      printf("pSetMSR[%d]=%d\n", i, pSetMSRs[i]);
       if ( pSetMSRs[i] < 0 )
       {
          return -1;
@@ -97,8 +98,9 @@ inline void setDCM(unsigned int coreID, unsigned int targetDCM)
 {
    assert(coreID < getCoreNumber());
    
+   printf("Before........................\n");   
    pwrite(pSetMSRs[coreID], &targetDCM, sizeof targetDCM, 0x19a);
-      
+   printf("WeiWeiWei........................\n");   
 }
 
 inline void setAllFreq(unsigned int targetFreq)
