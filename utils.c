@@ -49,7 +49,7 @@ int openCPUMSR(unsigned int coreID)
    snprintf(msrPathBuffer,BUFFER_PATH_SIZE,MSR_PATH_FORMAT,coreID);
  
 
-   int pMSR = open(msrPathBuffer, O_RDWR);
+   int pMSR = open(msrPathBuffer, O_WRONLY);
    if ( pMSR < 0)
    {
       fprintf(stderr,"Fail to open %s\n",msrPathBuffer);

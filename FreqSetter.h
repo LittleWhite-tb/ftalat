@@ -18,6 +18,7 @@
 
 #ifndef FREQSETTER_H
 #define FREQSETTER_H
+#include <stdint.h>
 
 /**
  * Open and prepare frequency operation
@@ -50,7 +51,7 @@ inline void setFreq(unsigned int coreID, unsigned int targetFreq);
  * \param coreID the id of the core to set
  * \param targetDCM the new DCM 
  */
-inline void setDCM(unsigned int coreID, unsigned int targetDCM);
+inline void setDCM(unsigned int coreID, uint64_t targetDCM);
 
 /**
  * Set a new frequency for all cores

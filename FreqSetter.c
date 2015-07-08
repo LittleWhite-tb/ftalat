@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <assert.h>
 
 #include <unistd.h>
@@ -94,13 +95,13 @@ inline void setFreq(unsigned int coreID, unsigned int targetFreq)
 }
 
 
-inline void setDCM(unsigned int coreID, unsigned int targetDCM)
+inline void setDCM(unsigned int coreID, uint64_t targetDCM)
 {
    assert(coreID < getCoreNumber());
    
-   printf("Before........................\n");   
-   pwrite(pSetMSRs[coreID], &targetDCM, sizeof targetDCM, 0x19a);
-   printf("WeiWeiWei........................\n");   
+   printf("Begin Setting Core %d to %x", coreID, targetDCM);
+   pwrite(pSetMSRs[coreID], &targetDCM, sizeof targetDCM, 0x19A);
+   printf("Finish Setting Core %d to %x", coreID, targetDCM);
 }
 
 inline void setAllFreq(unsigned int targetFreq)
