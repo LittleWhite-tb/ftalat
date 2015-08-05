@@ -149,6 +149,25 @@ unsigned int getCurFreq(unsigned int coreID)
    return freq;
 }
 
+unsigned int getCurDCM(unsigned int coreID)
+{
+   assert(coreID < getCoreNumber());
+   
+   unsigned int dcm = 0;
+   
+   int pMSRFile = openCPUMSR(coreID);
+   if ( pMSRFile > 0 )
+   {
+      /* IA32_CLOCK_MODULATION = 0x19a */
+      pread(pMSRFile, &dcm, sizeof dcm, 0x19a);
+      
+      close(pMSRFile);
+   }
+   
+   return dcm;
+
+}
+
 inline void waitCurFreq(unsigned int coreID, unsigned int targetFreq)
 {
    assert(coreID < getCoreNumber());
@@ -168,6 +187,8 @@ inline void waitCurFreq(unsigned int coreID, unsigned int targetFreq)
       }
    }while(freq != targetFreq);
 }
+
+/* not sure if we need waitCurDCM */
 
 unsigned int getMinAvailableFreq(unsigned int coreID)
 {

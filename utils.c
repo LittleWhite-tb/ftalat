@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <sched.h>
 
+#include <fcntl.h>
+
 FILE* openCPUFreqFile(unsigned int coreID, const char* fileName, const char* mode)
 {
    char filePathBuffer[BUFFER_PATH_SIZE]= {'\0'};
@@ -40,6 +42,23 @@ FILE* openCPUFreqFile(unsigned int coreID, const char* fileName, const char* mod
    
    return pFile;
 }
+
+int openCPUMSR(unsigned int coreID)
+{
+   char msrPathBuffer[BUFFER_PATH_SIZE]= {'\0'};
+   snprintf(msrPathBuffer,BUFFER_PATH_SIZE,MSR_PATH_FORMAT,coreID);
+ 
+
+   int pMSR = open(msrPathBuffer, O_WRONLY);
+   if ( pMSR < 0)
+   {
+      fprintf(stderr,"Fail to open %s\n",msrPathBuffer);
+   }
+   
+   return pMSR;
+}
+
+
 
 void pinCPU(int cpu)
 {
